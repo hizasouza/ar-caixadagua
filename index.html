@@ -192,7 +192,7 @@
 </div>
 
 <a-scene
-  mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiScanning: no; uiLoading: no;"
+  mindar-image="imageTargetSrc: ./targets.mind; uiScanning: no; uiLoading: no;"
   color-space="sRGB"
   renderer="colorManagement: true, physicallyCorrectLights"
   vr-mode-ui="enabled: false"
@@ -213,16 +213,16 @@
   const closePanelBtn = document.getElementById('close-panel');
   const targetEntity = document.getElementById('target');
 
-  let arStarted = false;
   let panelManuallyClosed = false;
 
   startBtn.addEventListener('click', () => {
     startScreen.style.display = 'none';
     scanHint.style.display = 'flex';
-    if (!arStarted) {
-      sceneEl.systems['mindar-image-system'].start();
-      arStarted = true;
-    }
+  });
+
+  sceneEl.addEventListener('arError', (e) => {
+    console.error('MindAR error:', e.detail);
+    alert('Erro ao iniciar a câmera: ' + JSON.stringify(e.detail));
   });
 
   targetEntity.addEventListener('targetFound', () => {
