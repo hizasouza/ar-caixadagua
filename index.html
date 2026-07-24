@@ -11,17 +11,8 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #000;
+  body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
-
-  a-scene {
-    width: 100%;
-    height: 100%;
   }
 
   /* Tela inicial */
@@ -192,7 +183,7 @@
 </div>
 
 <a-scene
-  mindar-image="imageTargetSrc: ./targets.mind; uiScanning: no; uiLoading: no;"
+  mindar-image="imageTargetSrc: ./targets.mind;"
   color-space="sRGB"
   renderer="colorManagement: true, physicallyCorrectLights"
   vr-mode-ui="enabled: false"
