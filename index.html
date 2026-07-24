@@ -94,71 +94,6 @@
     0%, 100% { opacity: 0.3; }
     50% { opacity: 1; }
   }
-
-  /* Painel de texto AR */
-  #info-panel {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 50;
-    background: #000;
-    color: #fff;
-    padding: 28px 24px calc(28px + env(safe-area-inset-bottom));
-    border-top: 3px solid #fff;
-    transform: translateY(110%);
-    transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1);
-    max-height: 62vh;
-    overflow-y: auto;
-  }
-
-  #info-panel.visible {
-    transform: translateY(0);
-  }
-
-  #info-panel .eyebrow {
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #999;
-    margin-bottom: 8px;
-  }
-
-  #info-panel h2 {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: 0.01em;
-    text-transform: uppercase;
-    line-height: 1.25;
-    margin-bottom: 16px;
-  }
-
-  #info-panel p {
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.6;
-    margin-bottom: 14px;
-    color: #f2f2f2;
-  }
-
-  #info-panel p:last-child { margin-bottom: 0; }
-
-  #close-panel {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #fff;
-    color: #000;
-    border: none;
-    font-size: 18px;
-    font-weight: 800;
-    line-height: 1;
-    cursor: pointer;
-  }
 </style>
 </head>
 <body>
@@ -174,14 +109,6 @@
   Procurando a imagem&hellip;
 </div>
 
-<div id="info-panel">
-  <button id="close-panel" aria-label="Fechar">&times;</button>
-  <div class="eyebrow">Porto Velho · Rondônia</div>
-  <h2>As Três Caixas d'Água</h2>
-  <p>No coração de Porto Velho, três imponentes torres de ferro testemunham o nascimento de um estado. Conhecidas como as "Três Caixas d'Água", essas estruturas são os maiores símbolos da identidade rondoniense, erguidas entre 1910 e 1912 para abastecer a população durante a construção da lendária Estrada de Ferro Madeira-Mamoré.</p>
-  <p>Fabricadas nos Estados Unidos pela Chicago Bridge &amp; Iron Works, as peças atravessaram o oceano para serem montadas no topo de uma colina. Cada reservatório cilíndrico tem capacidade para 200 mil litros e, por meio da gravidade, o sistema distribuiu água potável para a capital até 1957, representando um marco de pioneirismo técnico na Amazônia ocidental.</p>
-</div>
-
 <a-scene
   mindar-image="imageTargetSrc: ./targets.mind;"
   color-space="sRGB"
@@ -192,6 +119,50 @@
   <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;"></a-camera>
 
   <a-entity id="target" mindar-image-target="targetIndex: 0">
+    <a-entity id="ar-content" position="0 -0.75 0">
+      <a-plane
+        color="#000000"
+        opacity="0.88"
+        width="1.5"
+        height="1.5"
+        position="0 -0.75 -0.02"
+      ></a-plane>
+
+      <a-text
+        value="AS TRÊS CAIXAS D'ÁGUA"
+        color="#FFFFFF"
+        font="exo2bold"
+        align="center"
+        anchor="center"
+        width="1.4"
+        wrap-count="22"
+        position="0 -0.12 0"
+      ></a-text>
+
+      <a-text
+        value="No coração de Porto Velho, três imponentes torres de ferro testemunham o nascimento de um estado. Conhecidas como as 'Três Caixas d'Água', essas estruturas são os maiores símbolos da identidade rondoniense, erguidas entre 1910 e 1912 para abastecer a população durante a construção da lendária Estrada de Ferro Madeira-Mamoré."
+        color="#FFFFFF"
+        font="exo2bold"
+        align="center"
+        anchor="center"
+        width="1.35"
+        wrap-count="38"
+        line-height="46"
+        position="0 -0.58 0"
+      ></a-text>
+
+      <a-text
+        value="Fabricadas nos Estados Unidos pela Chicago Bridge & Iron Works, as peças atravessaram o oceano para serem montadas no topo de uma colina. Cada reservatório tem capacidade para 200 mil litros e, por gravidade, abasteceu a capital até 1957."
+        color="#FFFFFF"
+        font="exo2bold"
+        align="center"
+        anchor="center"
+        width="1.35"
+        wrap-count="38"
+        line-height="46"
+        position="0 -1.28 0"
+      ></a-text>
+    </a-entity>
   </a-entity>
 </a-scene>
 
@@ -200,11 +171,7 @@
   const startScreen = document.getElementById('start-screen');
   const startBtn = document.getElementById('start-btn');
   const scanHint = document.getElementById('scan-hint');
-  const infoPanel = document.getElementById('info-panel');
-  const closePanelBtn = document.getElementById('close-panel');
   const targetEntity = document.getElementById('target');
-
-  let panelManuallyClosed = false;
 
   startBtn.addEventListener('click', () => {
     startScreen.style.display = 'none';
@@ -218,20 +185,10 @@
 
   targetEntity.addEventListener('targetFound', () => {
     scanHint.style.display = 'none';
-    if (!panelManuallyClosed) {
-      infoPanel.classList.add('visible');
-    }
   });
 
   targetEntity.addEventListener('targetLost', () => {
     scanHint.style.display = 'flex';
-    infoPanel.classList.remove('visible');
-    panelManuallyClosed = false;
-  });
-
-  closePanelBtn.addEventListener('click', () => {
-    infoPanel.classList.remove('visible');
-    panelManuallyClosed = true;
   });
 </script>
 
