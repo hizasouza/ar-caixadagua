@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Três Caixas d'Água - Realidade Aumentada</title>
+
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  a-scene {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Tela inicial */
+  #start-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 32px;
+  }
+
+  #start-screen h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  #start-screen p {
+    font-size: 15px;
+    color: #b8b8b8;
+    max-width: 320px;
+    line-height: 1.5;
+    margin-bottom: 32px;
+  }
+
+  #start-btn {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 16px 40px;
+    font-size: 16px;
+    font-weight: 800;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  #start-btn:active { opacity: 0.7; }
+
+  /* Indicador de busca */
+  #scan-hint {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.3s ease;
+  }
+
+  #scan-hint .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    animation: pulse 1.2s infinite ease-in-out;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* Painel de texto AR */
+  #info-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    background: #000;
+    color: #fff;
+    padding: 28px 24px calc(28px + env(safe-area-inset-bottom));
+    border-top: 3px solid #fff;
+    transform: translateY(110%);
+    transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1);
+    max-height: 62vh;
+    overflow-y: auto;
+  }
+
+  #info-panel.visible {
+    transform: translateY(0);
+  }
+
+  #info-panel .eyebrow {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 8px;
+  }
+
+  #info-panel h2 {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+
+  #info-panel p {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.6;
+    margin-bottom: 14px;
+    color: #f2f2f2;
+  }
+
+  #info-panel p:last-child { margin-bottom: 0; }
+
+  #close-panel {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    border: none;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div id="start-screen">
+  <h1>Três Caixas d'Água</h1>
+  <p>Aponte a câmera para a peça da escultura para revelar a história por trás dela.</p>
+  <button id="start-btn">Abrir câmera</button>
+</div>
+
+<div id="scan-hint" style="display:none;">
+  <span class="dot"></span>
+  Procurando a imagem&hellip;
+</div>
+
+<div id="info-panel">
+  <button id="close-panel" aria-label="Fechar">&times;</button>
+  <div class="eyebrow">Porto Velho · Rondônia</div>
+  <h2>As Três Caixas d'Água</h2>
+  <p>No coração de Porto Velho, três imponentes torres de ferro testemunham o nascimento de um estado. Conhecidas como as "Três Caixas d'Água", essas estruturas são os maiores símbolos da identidade rondoniense, erguidas entre 1910 e 1912 para abastecer a população durante a construção da lendária Estrada de Ferro Madeira-Mamoré.</p>
+  <p>Fabricadas nos Estados Unidos pela Chicago Bridge &amp; Iron Works, as peças atravessaram o oceano para serem montadas no topo de uma colina. Cada reservatório cilíndrico tem capacidade para 200 mil litros e, por meio da gravidade, o sistema distribuiu água potável para a capital até 1957, representando um marco de pioneirismo técnico na Amazônia ocidental.</p>
+</div>
+
+<a-scene
+  mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiScanning: no; uiLoading: no;"
+  color-space="sRGB"
+  renderer="colorManagement: true, physicallyCorrectLights"
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false"
+>
+  <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;"></a-camera>
+
+  <a-entity id="target" mindar-image-target="targetIndex: 0">
+  </a-entity>
+</a-scene>
+
+<script>
+  const sceneEl = document.querySelector('a-scene');
+  const startScreen = document.getElementById('start-screen');
+  const startBtn = document.getElementById('start-btn');
+  const scanHint = document.getElementById('scan-hint');
+  const infoPanel = document.getElementById('info-panel');
+  const closePanelBtn = document.getElementById('close-panel');
+  const targetEntity = document.getElementById('target');
+
+  let arStarted = false;
+  let panelManuallyClosed = false;
+
+  startBtn.addEventListener('click', () => {
+    startScreen.style.display = 'none';
+    scanHint.style.display = 'flex';
+    if (!arStarted) {
+      sceneEl.systems['mindar-image-system'].start();
+      arStarted = true;
+    }
+  });
+
+  targetEntity.addEventListener('targetFound', () => {
+    scanHint.style.display = 'none';
+    if (!panelManuallyClosed) {
+      infoPanel.classList.add('visible');
+    }
+  });
+
+  targetEntity.addEventListener('targetLost', () => {
+    scanHint.style.display = 'flex';
+    infoPanel.classList.remove('visible');
+    panelManuallyClosed = false;
+  });
+
+  closePanelBtn.addEventListener('click', () => {
+    infoPanel.classList.remove('visible');
+    panelManuallyClosed = true;
+  });
+</script>
+
+</body>
+</html>
